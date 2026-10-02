@@ -10,7 +10,7 @@ pub fn create_post(
     new_title: &str,
     new_slug: &str,
     new_body: &str,
-) -> Post {
+) -> QueryResult<Post> {
     let new_post = NewPost {
         title: new_title,
         slug: new_slug,
@@ -21,7 +21,6 @@ pub fn create_post(
         .values(&new_post)
         .returning(Post::as_returning())
         .get_result(conn)
-        .expect("Error creando el post")
 }
 
 // Update
