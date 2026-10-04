@@ -8,6 +8,7 @@ use diesel::pg::PgConnection;
 use diesel::r2d2::{self, ConnectionManager, Pool};
 use dotenvy::dotenv;
 use std::env;
+use tera::Tera;
 
 pub type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
@@ -24,31 +25,18 @@ async fn main() -> std::io::Result<()> {
 
     let pool_data = web::Data::new(pool);
 
+    let tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*"))
+        .expect("Error cargando templates");
+
+    let tera_data = web::Data::new(tera);
+
     HttpServer::new(move || {
         App::new()
             .app_data(pool_data.clone())
+            .app_data(tera_data.clone())
             .configure(handlers::config) // <- Monta todas las rutas limpiamente
     })
     .bind(("0.0.0.0", 8081))?
     .run()
     .await
-
-    // // 1. Insertamos un nuevo post de prueba
-    // let nuevo = create_post(
-    //     &mut conn,
-    //     "Mi primer post en Rust",
-    //     "mi-primer-post",
-    //     "¡Hola desde Diesel y Supabase!",
-    // );
-
-    // println!(" Post creado con ID: {}", nuevo.id);
-
-    // // 2. Actualizamos el post
-    // let datos_actualizados = PostForm {
-    //     title: None,
-    //     slug: Some("chat-toto"),
-    //     body: None,
-    // };
-    // let post_modificado = update_post(&mut conn, 7341, &datos_actualizados);
-    // println!(" Post modificado con ID: {}", post_modificado.id);
 }
