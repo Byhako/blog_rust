@@ -3,11 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>{{ post.title }}</title>
 </head>
 <body>
-  <a href="/">Volver al inicio</a>
+  <a href="/">Regresar a la lista</a>
   <h1>{{ post.title }}</h1>
   <p>{{ post.body }}</p>
+  <small id="post-id" style="display: none;">{{ post.id }}</small>
+
+  <div>
+    <details>
+      <summary>Actualizar post</summary>
+      <form id="update-form">
+        <input type="text" name="title" placeholder="Título" id="update-title" value="{{ post.title }}">
+        <textarea name="body" placeholder="Cuerpo" id="update-body">{{ post.body }}</textarea>
+        <button type="button" id="update-btn">Actualizar</button>
+      </form>
+    </details>
+    <button type="button" id="delete-btn">Eliminar</button>
+  </div>
+
+  <script>
+    const postId = document.getElementById('post-id').textContent;
+    const deleteBtn = document.getElementById('delete-btn');
+    const updateBtn = document.getElementById('update-btn');
+
+    deleteBtn.addEventListener('click', async () => {
+      const res = await fetch(`/delete/${postId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        window.location.href = '/';
+      } else {
+        alert('Error al eliminar el post');
+      }
+    });
+
+    updateBtn.addEventListener('click', async () => {
+      const res = await fetch(`/update/${postId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: document.getElementById('update-title').value,
+          body: document.getElementById('update-body').value,
+        }),
+      });
+      if (res.ok) {
+        window.location.href = '/';
+      } else {
+        alert('Error al actualizar el post');
+      }
+    });
+  </script>
 </body>
 </html>

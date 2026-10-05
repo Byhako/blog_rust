@@ -7,15 +7,45 @@
 </head>
 <body>
   <h1>Mi blog en Rust</h1>
+  <details>
+    <summary>Crear nuevo post</summary>
+    <form id="post-form">
+      <input type="text" name="title" placeholder="Título" id="title">
+      <textarea name="body" placeholder="Cuerpo" id="body"></textarea>
+      <button type="submit">Crear post</button>
+    </form>
+  </details>
+  <hr>
   <ul>
     {% for post in posts %}
     <li>
       <h3>{{ post.title }}</h3>
-      <p>{{ post.body | truncate(length=150, killwords=true) }}</p>
+      <p>{{ post.body | truncate(length=50, killwords=true) }}</p>
+      <small id="post-id" style="display: none;">{{ post.id }}</small>
       <a href="/post/{{ post.slug }}">Leer más</a>
     </li>
     {% endfor %}
   </ul>
-  
+
+
+  <script>
+    document.getElementById('post-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const body = document.getElementById('body').value;
+
+      const res = await fetch('/new-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, body })
+      });
+
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert('Error al crear el post');
+      }
+    });
+  </script>
 </body>
 </html>

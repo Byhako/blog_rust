@@ -24,17 +24,19 @@ pub fn create_post(
 }
 
 // Update
-pub fn update_post(conn: &mut PgConnection, post_id: i32, form: &PostForm) -> Post {
+pub fn update_post(
+    conn: &mut PgConnection,
+    post_id: i32,
+    form: &PostForm,
+) -> QueryResult<Post> {
     diesel::update(posts.find(post_id))
         .set(form)
         .returning(Post::as_returning())
         .get_result(conn)
-        .expect("Error al actualizar el post")
 }
 
 // Delete
-pub fn delete_post(conn: &mut PgConnection, post_id: i32) -> usize {
+pub fn delete_post(conn: &mut PgConnection, post_id: i32) -> QueryResult<usize> {
     diesel::delete(posts.find(post_id))
         .execute(conn)
-        .expect("Error al eliminar el post")
 }
